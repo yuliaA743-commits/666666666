@@ -1564,7 +1564,8 @@ section{scroll-margin-top:var(--nav-h)}
       submitBtn.disabled = true;
       submitBtn.textContent = 'Надсилаємо…';
 
-      var NETLIFY_URL = 'https://aquakids.netlify.app/';
+      /* ВАЖЛИВО: тут має бути точна адреса вашого сайту на Netlify (з Site overview у Netlify) */
+      var NETLIFY_URL = 'https://reliable-raindrop-8f70bb.netlify.app/';
       var body = new URLSearchParams(data).toString();
       var onGithub = /github\.io$/i.test(location.hostname) || location.protocol === 'file:';
 
@@ -1584,12 +1585,13 @@ section{scroll-margin-top:var(--nav-h)}
         var opts = {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: body,
-          redirect: 'manual' /* Netlify після збереження віддає 303-редирект — за ним не йдемо */
+          body: body
         };
         if (cross) opts.mode = 'no-cors';
         return fetch(url, opts).then(function (res) {
-          if (res.type !== 'opaque' && res.type !== 'opaqueredirect' && !res.ok) {
+          console.log('Netlify Forms: відповідь', res.type, res.status, res.redirected ? '(після редиректу)' : '');
+          /* Успіх: 200 OK, або Netlify зберіг заявку й зробив редирект (redirected), або крос-доменний запит (opaque) */
+          if (res.type !== 'opaque' && !res.ok && !res.redirected) {
             var httpErr = new Error('HTTP ' + res.status);
             httpErr.httpStatus = res.status;
             throw httpErr;
